@@ -55,7 +55,7 @@ consumer_config = dict(config_parser["kafka_client"])
 consumer_config.update(config_parser["consumer"])
 
 pizza_producer = Producer(producer_config)
-pizza_consumer = Consumer(consumer_config)
+pizza_with_veggies_consumer = Consumer(consumer_config)
 
 ######################################################################
 
@@ -85,14 +85,6 @@ def service_add_pizza(pizza: Pizza) -> None:
         order.add_pizza(pizza)
 
 
-def service_load_orders() -> None:
-    pizza_consumer.subscribe(["pizza-with-veggies"])
-    while True:
-        if event := pizza_consumer.poll(1.0):
-            pizza: Pizza = Pizza.from_dict(json.loads(event.value()))
-            service_add_pizza(pizza)
-
-
 ######################################################################
 
 app = FastAPI()
@@ -114,3 +106,11 @@ def order_pizzas(count: int):
 
 
 ######################################################################
+
+
+def consume_veggies() -> None:
+    pizza_with_veggies_consumer.subscribe(["pizza-with-veggies"])
+    while True:
+        if event := pizza_with_veggies_consumer.poll(1.0):
+            pizza: Pizza = Pizza.from_dict(json.loads(event.value()))
+            service_add_pizza(pizza)
