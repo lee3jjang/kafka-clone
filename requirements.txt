@@ -2,3 +2,5 @@ fastapi
 sqlalchemy
 uvicorn[standard]
 mypy
+confluent-kafka
+configparser
